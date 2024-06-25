@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
@@ -24,13 +25,17 @@ class CategoryController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255|unique:categories',
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255|unique:categories,name',
         ]);
+
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
+        }
 
         $slug = Str::slug($request->name);
 
-        Category::create([
+        $category = Category::create([
             'name' => $request->name,
             'slug' => $slug,
         ]);
@@ -47,15 +52,17 @@ class CategoryController extends Controller
 
     public function update(Request $request, Category $category)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255|unique:categories,name,' . $category->id,
         ]);
 
-        $slug = Str::slug($request->name);
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
+        }
 
         $category->update([
             'name' => $request->name,
-            'slug' => $slug,
+            'slug' => Str::slug($request->name),
         ]);
 
         return redirect()->route('categories.index');
