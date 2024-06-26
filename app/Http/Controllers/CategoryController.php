@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Log;
 
 class CategoryController extends Controller
 {
@@ -43,30 +44,27 @@ class CategoryController extends Controller
         return redirect()->route('categories.index');
     }
 
-    public function edit(Category $category)
-    {
-        return Inertia::render('Categories/Edit', [
-            'category' => $category
-        ]);
-    }
-
     public function update(Request $request, Category $category)
-    {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255|unique:categories,name,' . $category->id,
-        ]);
+{
+    Log::info('Update method called for category ID: ' . $category->id);
 
-        if ($validator->fails()) {
-            return back()->withErrors($validator)->withInput();
-        }
+    $validator = Validator::make($request->all(), [
+        'name' => 'required|string|max:255|unique:categories,name,' . $category->id,
+    ]);
 
-        $category->update([
-            'name' => $request->name,
-            'slug' => Str::slug($request->name),
-        ]);
-
-        return redirect()->route('categories.index');
+    if ($validator->fails()) {
+        return back()->withErrors($validator)->withInput();
     }
+
+    $category->update([
+        'name' => $request->name,
+        'slug' => Str::slug($request->name),
+    ]);
+
+    Log::info('Category updated successfully for ID: ' . $category->id);
+
+    return redirect()->route('categories.index');
+}
 
     public function destroy(Category $category)
     {

@@ -70,6 +70,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                 >
                                     Penjualan
                                 </Link>
+
+                                <Link
+                                    href="/categories"
+                                    className="text-gray-900 hover:bg-gray-100 px-3 py-2 rounded-md text-sm font-medium"
+                                >
+                                    Kategori
+                                </Link>
                                 <Link
                                     href="/products"
                                     className="text-gray-900 hover:bg-gray-100 px-3 py-2 rounded-md text-sm font-medium"
@@ -148,6 +155,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                 className="text-gray-900 hover:bg-gray-100 block px-3 py-2 rounded-md text-base font-medium"
                             >
                                 Produk
+                            </Link>
+                            <Link
+                                href="/categories"
+                                className="text-gray-900 hover:bg-gray-100 block px-3 py-2 rounded-md text-base font-medium"
+                            >
+                                Kategori
                             </Link>
                             <Link
                                 href="/reports"

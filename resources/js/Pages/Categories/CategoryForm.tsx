@@ -1,16 +1,19 @@
 import React, { FormEvent, useState, useEffect } from 'react';
 
-interface Props {
-  category: {
-    id: number;
-    name: string;
-    slug: string;
-  };
+interface Category {
+  id?: number;
+  name: string;
+  slug: string;
 }
 
-const Edit: React.FC<Props> = ({ category }) => {
-  const [name, setName] = useState(category.name || '');
-  const [slug, setSlug] = useState(category.slug || '');
+interface Props {
+  category: Category | null;
+  onClose: () => void;
+}
+
+const CategoryForm: React.FC<Props> = ({ category, onClose }) => {
+  const [name, setName] = useState(category ? category.name : '');
+  const [slug, setSlug] = useState(category ? category.slug : '');
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -27,8 +30,11 @@ const Edit: React.FC<Props> = ({ category }) => {
         throw new Error('CSRF token not found');
       }
 
-      const response = await fetch(`/categories/${category.id}`, {
-        method: 'PUT',
+      const url = category ? `/categories/${category.id}` : '/categories';
+      const method = category ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
           'X-CSRF-TOKEN': csrfToken
@@ -42,24 +48,24 @@ const Edit: React.FC<Props> = ({ category }) => {
           if (data.errors) {
             setError(data.errors.name[0]);
           } else {
-            setError('Failed to update category');
+            setError('Failed to save category');
           }
         } else {
-          setError('Failed to update category');
+          setError('Failed to save category');
         }
         return;
       }
 
-      window.location.href = '/categories'; // Redirect to categories index
+      window.location.reload(); // Reload the page to reflect changes
     } catch (error) {
-      console.error('Error updating category:', error);
-      setError('Failed to update category');
+      console.error('Error saving category:', error);
+      setError('Failed to save category');
     }
   };
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Edit Category</h1>
+      <h1 className="text-2xl font-bold mb-4">{category ? 'Edit Category' : 'Add Category'}</h1>
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
@@ -90,10 +96,10 @@ const Edit: React.FC<Props> = ({ category }) => {
             {error}
           </div>
         )}
-        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Update</button>
+        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">{category ? 'Update' : 'Save'}</button>
       </form>
     </div>
   );
 };
 
-export default Edit;
+export default CategoryForm;
